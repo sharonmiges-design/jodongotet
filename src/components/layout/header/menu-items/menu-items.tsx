@@ -1,60 +1,60 @@
-// ========================================
-// MENU ITEMS PLACEHOLDER FOR WHITE-LABELING
-// ========================================
-//
-// This component has been simplified for white-labeling.
-// Third-party developers can add custom menu items here.
-//
-// EXAMPLE USAGE:
-// --------------
-// import { observer } from 'mobx-react-lite';
-// import { useStore } from '@/hooks/useStore';
-// import { useTranslations } from '@deriv-com/translations';
-// import { MenuItem, Text } from '@deriv-com/ui';
-//
-// export const MenuItems = observer(() => {
-//     const { localize } = useTranslations();
-//     const store = useStore();
-//     const is_logged_in = store?.client?.is_logged_in ?? false;
-//
-//     if (!is_logged_in) return null;
-//
-//     return (
-//         <>
-//             <MenuItem
-//                 as='a'
-//                 className='app-header__menu'
-//                 href='/your-page'
-//                 leftComponent={YourIcon}
-//             >
-//                 <Text>{localize('Your Menu Item')}</Text>
-//             </MenuItem>
-//         </>
-//     );
-// });
-//
-// For mobile menu items, see:
-// src/components/layout/header/mobile-menu/use-mobile-menu-config.tsx
-
+import React from 'react';
 import { observer } from 'mobx-react-lite';
 
+const NAV_ITEMS = [
+    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Free Bots', href: '/dashboard#free-bots' },
+    { name: 'Premium Bots', href: '/premium-bots' },
+    { name: 'Bot Builder', href: '/bot-builder' },
+    { name: 'DCircles', href: '/dcircles' },
+    { name: 'Speed Lab', href: '/speed-lab' },
+    { name: 'Pro Hedge', href: '/pro-hedge' },
+    { name: 'Charts', href: '/charts' },
+];
+
 export const MenuItems = observer(() => {
-    // No menu items by default - add your custom menu items here
-    return null;
+    return (
+        <nav
+            aria-label='Jodongo Tet navigation'
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                overflowX: 'auto',
+                maxWidth: '100%',
+                whiteSpace: 'nowrap',
+                padding: '8px',
+            }}
+        >
+            {NAV_ITEMS.map(item => (
+                <a
+                    key={item.name}
+                    href={item.href}
+                    style={{
+                        color: 'inherit',
+                        textDecoration: 'none',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        padding: '8px 4px',
+                    }}
+                >
+                    {item.name}
+                </a>
+            ))}
+        </nav>
+    );
 });
 
 export const TradershubLink = observer(() => {
-    // No default Traders Hub link - add your custom navigation here if needed
     return null;
 });
 
-// Create a namespace for MenuItems to include TradershubLink
 type MenuItemsType = typeof MenuItems & {
     TradershubLink: typeof TradershubLink;
 };
 
-// Assign TradershubLink to MenuItems
 (MenuItems as MenuItemsType).TradershubLink = TradershubLink;
 
+export default MenuItems as MenuItemsType;
 export default MenuItems as MenuItemsType;
 // [/AI]
