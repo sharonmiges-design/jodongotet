@@ -6,6 +6,8 @@
  * Clears authentication data from local storage and reloads the page
  */
 export const clearAuthData = () => {
+    sessionStorage.removeItem('auth_info');
+    localStorage.removeItem('auth_info');
     localStorage.removeItem('authToken');
     localStorage.removeItem('active_loginid');
     localStorage.removeItem('client.country');

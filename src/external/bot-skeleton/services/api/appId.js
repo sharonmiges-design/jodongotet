@@ -73,7 +73,7 @@ export const generateDerivApiInstance = async (forceNew = false) => {
 
             currentWebSocketURL = wsURL;
 
-            console.log('[DerivAPI] Creating new WebSocket connection to:', wsURL);
+            // OTP WebSocket URLs contain credentials and must never be logged.
             const deriv_socket = new WebSocket(wsURL);
             const deriv_api = new DerivAPIBasic({
                 connection: deriv_socket,
@@ -97,8 +97,8 @@ export const generateDerivApiInstance = async (forceNew = false) => {
                 console.log('[DerivAPI] WebSocket connection established');
             });
 
-            deriv_socket.addEventListener('error', error => {
-                console.error('[DerivAPI] WebSocket connection error:', error);
+            deriv_socket.addEventListener('error', () => {
+                console.error('[DerivAPI] WebSocket connection error. Reconnect through the account controls.');
             });
 
             return deriv_api;

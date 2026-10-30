@@ -1,0 +1,6 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": { "baseUrl": ".", "types": ["node"], "allowJs": false },
+    "include": ["db/**/*.ts", "netlify/functions/**/*.mts", "netlify/functions/lib/**/*.ts", "drizzle.config.ts"],
+    "exclude": ["node_modules"]
+}

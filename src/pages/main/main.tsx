@@ -43,6 +43,7 @@ import ChartModal from '../chart/chart-modal';
 import Dashboard from '../dashboard';
 import RunStrategy from '../dashboard/run-strategy';
 import './main.scss';
+import { TradingPlatform, TradingNavigation, ExtraPage, PLATFORM_PAGES } from '../trading/platform';
 
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
 const Tutorial = lazy(() => import('../tutorials'));
@@ -78,7 +79,7 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial'];
+    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'free_bots', 'premium_bots', 'dcircles', 'speed_lab', 'pro_hedge', 'risk_calculator', 'manual_trade', 'copy_trading'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -125,8 +126,12 @@ const AppWrapper = observer(() => {
     let tab_value: number | string = active_tab;
     const GetHashedValue = (tab: number) => {
         tab_value = location.hash?.split('#')[1];
-        if (!tab_value) return is_preview_mode ? BOT_BUILDER : tab;
-        return Number(hash.indexOf(String(tab_value)));
+        if (!tab_value) {
+            const page = PLATFORM_PAGES.find(page => location.pathname === `/${page.path}`);
+            return page ? page.tab : is_preview_mode ? BOT_BUILDER : tab;
+        }
+        const index = hash.indexOf(String(tab_value));
+        return index < 0 ? DASHBOARD : index;
     };
     const active_hash_tab = GetHashedValue(active_tab);
 
@@ -173,9 +178,10 @@ const AppWrapper = observer(() => {
                 threshold: 0.5, // set offset 0.1 means trigger if atleast 10% of element in viewport
             }
         );
-        observer_dashboard.observe(el_dashboard);
-        observer_tutorial.observe(el_tutorial);
-    });
+        if (el_dashboard) observer_dashboard.observe(el_dashboard);
+        if (el_tutorial) observer_tutorial.observe(el_tutorial);
+        return () => { observer_dashboard.disconnect(); observer_tutorial.disconnect(); };
+    }, []);
 
     React.useEffect(() => {
         if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -282,10 +288,6 @@ const AppWrapper = observer(() => {
             setActiveTab(Number(active_hash_tab));
             if (!isDesktop) handleTabChange(Number(active_hash_tab));
             init_render.current = false;
-        } else {
-            // Preserve URL parameters when navigating
-            const currentSearch = window.location.search;
-            navigate(`${currentSearch}#${hash[active_tab] || hash[0]}`);
         }
         if (active_tour !== '') {
             setActiveTour('');
@@ -344,6 +346,7 @@ const AppWrapper = observer(() => {
     const handleTabChange = React.useCallback(
         (tab_index: number) => {
             setActiveTab(tab_index);
+            navigate(`${location.search}#${hash[tab_index] || hash[0]}`);
             const el_id = TAB_IDS[tab_index];
             if (el_id) {
                 const el_tab = document.getElementById(el_id);
@@ -353,8 +356,15 @@ const AppWrapper = observer(() => {
             }
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [active_tab]
+        [active_tab, location.search, navigate]
     );
+
+    useEffect(() => {
+        const page = PLATFORM_PAGES.find(page => location.pathname === `/${page.path}`);
+        const index = hash.indexOf(location.hash.slice(1));
+        if (index >= 0) setActiveTab(index);
+        else if (page) setActiveTab(page.tab);
+    }, [location.hash, location.pathname, setActiveTab]);
 
     // [AI]
     const handleLoginGeneration = async () => {
@@ -367,7 +377,8 @@ const AppWrapper = observer(() => {
     };
     // [/AI]
     return (
-        <React.Fragment>
+        <TradingPlatform legacyRunning={() => run_panel.is_running || run_panel.has_open_contract} onStopLegacy={() => { if (run_panel.is_running) stopBot(); }}>
+            <TradingNavigation activeTab={active_tab} onNavigate={handleTabChange} />
             <div className='main'>
                 <div
                     className={classNames('main__container', {
@@ -452,6 +463,9 @@ const AppWrapper = observer(() => {
                                     </Suspense>
                                 </div>
                             </div>
+                            {[4, 5, 6, 7, 8, 9, 10, 11].map(tab => (
+                                <div key={tab} label={PLATFORM_PAGES.find(page => page.tab === tab)?.name} id={`jt-page-${tab}`}><ExtraPage tab={tab} /></div>
+                            ))}
                         </Tabs>
                         {!isDesktop && right_tab_shadow && <span className='tabs-shadow tabs-shadow--right' />}{' '}
                     </div>
@@ -499,7 +513,7 @@ const AppWrapper = observer(() => {
                     />
                 );
             })()}
-        </React.Fragment>
+        </TradingPlatform>
     );
 });
 

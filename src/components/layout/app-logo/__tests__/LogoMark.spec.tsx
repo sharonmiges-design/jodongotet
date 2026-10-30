@@ -11,6 +11,9 @@ jest.mock('../../../../utils/branding', () => {
     const actual = jest.requireActual('../../../../utils/branding');
     return {
         ...actual,
+        // Isolate these logo-rendering tests from the installed site's brand settings.
+        getAppName: () => 'Deriv Trading Bot',
+        getShowAppName: () => true,
         getLogoCandidates: (): string[] => mockLogoCandidates,
     };
 });

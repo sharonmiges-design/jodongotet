@@ -57,22 +57,34 @@ export function clearCodeVerifier(): void {
 
 // --- Auth Info ---
 
+// Credentials belong to the current browser session, not durable shared local storage.
 export function storeAuthInfo(authInfo: AuthInfo): void {
-  localStorage.setItem(AUTH_INFO_KEY, JSON.stringify(authInfo));
+  sessionStorage.setItem(AUTH_INFO_KEY, JSON.stringify(authInfo));
+  localStorage.removeItem(AUTH_INFO_KEY);
 }
 
 export function getAuthInfo(): AuthInfo | null {
-  const raw = localStorage.getItem(AUTH_INFO_KEY);
-  if (!raw) return null;
-
-  const authInfo: AuthInfo = JSON.parse(raw);
-  if (authInfo.expires_at && Date.now() > authInfo.expires_at * 1000) {
-    return null; // Token expired
+  try {
+    const current = sessionStorage.getItem(AUTH_INFO_KEY);
+    const legacy = current ? null : localStorage.getItem(AUTH_INFO_KEY);
+    const raw = current || legacy;
+    if (!raw) return null;
+    const authInfo: AuthInfo = JSON.parse(raw);
+    if (typeof authInfo.access_token !== 'string' || !authInfo.access_token ||
+        (!Number.isFinite(authInfo.expires_at) || Date.now() >= authInfo.expires_at * 1000)) {
+      clearAuthInfo();
+      return null;
+    }
+    if (legacy) storeAuthInfo(authInfo);
+    return authInfo;
+  } catch {
+    clearAuthInfo();
+    return null;
   }
-  return authInfo;
 }
 
 export function clearAuthInfo(): void {
+  sessionStorage.removeItem(AUTH_INFO_KEY);
   localStorage.removeItem(AUTH_INFO_KEY);
 }
 

@@ -58,6 +58,7 @@ const router = createBrowserRouter(
             <Route index element={<AppRoot />} />
             {/* App Builder embeds the template at /preview — render the same app shell */}
             <Route path='preview' element={<AppRoot />} />
+            <Route path=':section' element={<AppRoot />} />
         </Route>
     ),
     { basename: routerBasename }
@@ -92,7 +93,7 @@ function App() {
 
                 if (accounts && accounts.length > 0) {
                     DerivWSAccountsService.storeAccounts(accounts);
-                    const firstAccount = accounts[0];
+                    const firstAccount = accounts.find(account => account.account_type === 'demo') || accounts[0];
                     localStorage.setItem('active_loginid', firstAccount.account_id);
                     const isDemo =
                         firstAccount.account_id.startsWith('VRT') || firstAccount.account_id.startsWith('VRTC');
