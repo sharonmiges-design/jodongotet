@@ -19,4 +19,4 @@ type THeader = {
 const HEADERS: THeader[] = [
     {
         label: localize('Bot name'),
-        className: 'bot-li
+        className: 'bot-list',
