@@ -7,6 +7,7 @@ module.exports = {
             jsx: true,
         },
     },
+    settings: { react: { version: 'detect' } },
     env: {
         browser: true,
         node: true,

@@ -9,6 +9,7 @@ import OnboardTourHandler from '../tutorials/dbot-tours/onboarding-tour';
 import Announcements from './announcements';
 import Cards from './cards';
 import InfoPanel from './info-panel';
+import CloudLibrary from '../trading/cloud-library';
 
 type TMobileIconGuide = {
     handleTabChange: (active_number: number) => void;
@@ -25,25 +26,6 @@ const DashboardComponent = observer(
         const has_dashboard_strategies = !!dashboard_strategies?.length;
         const { isDesktop, isTablet } = useDevice();
 
-        // Trading Calculator
-        const [stake, setStake] = React.useState('1');
-        const [payout, setPayout] = React.useState('1.95');
-
-        const stakeAmount = Number(stake);
-        const payoutAmount = Number(payout);
-
-        const isValid =
-            stake.trim() !== '' &&
-            payout.trim() !== '' &&
-            Number.isFinite(stakeAmount) &&
-            Number.isFinite(payoutAmount) &&
-            stakeAmount > 0 &&
-            payoutAmount >= 0;
-
-        const potentialProfit = payoutAmount - stakeAmount;
-
-        const formatAmount = (value: number) => value.toFixed(2);
-
         return (
             <React.Fragment>
                 <div
@@ -52,6 +34,7 @@ const DashboardComponent = observer(
                     })}
                 >
                     <div className='tab__dashboard__content'>
+                        <section className='jt-dashboard-intro'><p className='jt-eyebrow'>YOUR TRADING WORKSPACE</p><h1>Welcome to JODONGO TET</h1><p>Build a strategy, study live markets, and keep your risk in view.</p><div className='jt-actions'><a className='jt-primary' href={`${window.location.search}#free_bots`}>Explore Free Bots</a><a className='jt-secondary' href={`${window.location.search}#risk_calculator`}>Plan your risk</a></div><small>Trading involves loss. Start with a demo account and review every session.</small></section>
 
                         {client.is_logged_in && (
                             <Announcements
@@ -60,6 +43,8 @@ const DashboardComponent = observer(
                                 handleTabChange={handleTabChange}
                             />
                         )}
+
+                        <CloudLibrary onLoad={() => handleTabChange(1)} />
 
                         {/* ORIGINAL DERIV DASHBOARD */}
 
@@ -118,187 +103,6 @@ const DashboardComponent = observer(
                             />
                         </div>
 
-                        {/* JODONGO TET ANALYSIS TOOLS */}
-
-                        <section
-                            style={{
-                                background: '#101827',
-                                color: '#ffffff',
-                                borderRadius: '16px',
-                                padding: '24px',
-                                margin: '24px 0',
-                            }}
-                        >
-                            <h2
-                                style={{
-                                    fontSize: '26px',
-                                    fontWeight: 700,
-                                    marginBottom: '8px',
-                                }}
-                            >
-                                📊 Jodongo Tet Analysis Tools
-                            </h2>
-
-                            <p
-                                style={{
-                                    color: '#b8c5d6',
-                                    marginBottom: '24px',
-                                }}
-                            >
-                                Calculate your potential trading profit
-                                and loss before placing a trade.
-                            </p>
-
-                            <div
-                                style={{
-                                    background: '#1b2738',
-                                    padding: '20px',
-                                    borderRadius: '12px',
-                                    border: '1px solid #344156',
-                                    maxWidth: '500px',
-                                }}
-                            >
-                                <h3
-                                    style={{
-                                        fontSize: '20px',
-                                        marginBottom: '20px',
-                                    }}
-                                >
-                                    💰 Trading Calculator
-                                </h3>
-
-                                <label
-                                    htmlFor='jodongo-stake'
-                                    style={{
-                                        display: 'block',
-                                        marginBottom: '8px',
-                                    }}
-                                >
-                                    Stake Amount
-                                </label>
-
-                                <input
-                                    id='jodongo-stake'
-                                    type='number'
-                                    min='0.01'
-                                    step='0.01'
-                                    value={stake}
-                                    onChange={event =>
-                                        setStake(event.target.value)
-                                    }
-                                    style={{
-                                        width: '100%',
-                                        padding: '12px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #526277',
-                                        marginBottom: '20px',
-                                        boxSizing: 'border-box',
-                                        color: '#111827',
-                                        background: '#ffffff',
-                                    }}
-                                />
-
-                                <label
-                                    htmlFor='jodongo-payout'
-                                    style={{
-                                        display: 'block',
-                                        marginBottom: '8px',
-                                    }}
-                                >
-                                    Expected Total Payout
-                                </label>
-
-                                <input
-                                    id='jodongo-payout'
-                                    type='number'
-                                    min='0'
-                                    step='0.01'
-                                    value={payout}
-                                    onChange={event =>
-                                        setPayout(event.target.value)
-                                    }
-                                    style={{
-                                        width: '100%',
-                                        padding: '12px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #526277',
-                                        marginBottom: '20px',
-                                        boxSizing: 'border-box',
-                                        color: '#111827',
-                                        background: '#ffffff',
-                                    }}
-                                />
-
-                                <div
-                                    aria-live='polite'
-                                    style={{
-                                        background: '#263449',
-                                        padding: '16px',
-                                        borderRadius: '10px',
-                                    }}
-                                >
-                                    {isValid ? (
-                                        <>
-                                            <p>
-                                                Stake:{' '}
-                                                <strong>
-                                                    {formatAmount(stakeAmount)}
-                                                </strong>
-                                            </p>
-
-                                            <p>
-                                                Total Payout:{' '}
-                                                <strong>
-                                                    {formatAmount(payoutAmount)}
-                                                </strong>
-                                            </p>
-
-                                            <p>
-                                                Potential Profit / Loss:{' '}
-                                                <strong
-                                                    style={{
-                                                        color:
-                                                            potentialProfit >= 0
-                                                                ? '#4ade80'
-                                                                : '#f87171',
-                                                    }}
-                                                >
-                                                    {formatAmount(
-                                                        potentialProfit
-                                                    )}
-                                                </strong>
-                                            </p>
-
-                                            <p>
-                                                Maximum Stake Loss:{' '}
-                                                <strong>
-                                                    {formatAmount(stakeAmount)}
-                                                </strong>
-                                            </p>
-                                        </>
-                                    ) : (
-                                        <p>
-                                            Enter a stake greater than zero
-                                            and a valid payout.
-                                        </p>
-                                    )}
-                                </div>
-
-                                <p
-                                    style={{
-                                        fontSize: '12px',
-                                        color: '#aab7ca',
-                                        marginTop: '16px',
-                                    }}
-                                >
-                                    Enter amounts in your account currency.
-                                    This calculator uses your inputs,
-                                    not live market data.
-                                    Results are estimates, not trading
-                                    signals. Trading involves risk.
-                                </p>
-                            </div>
-                        </section>
                     </div>
                 </div>
 

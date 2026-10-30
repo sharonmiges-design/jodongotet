@@ -1,4 +1,5 @@
 // @ts-nocheck — vendored bot code with known upstream type gaps; see AGENTS.md
+import { sessionSnapshot } from '@/services/trading/session';
 import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { botNotification } from '@/components/bot-notification/bot-notification';
 import { notification_message } from '@/components/bot-notification/bot-notification-utils';
@@ -161,6 +162,7 @@ export default class RunPanelStore {
     };
 
     onRunButtonClick = async () => {
+        if (this.is_running || sessionSnapshot().busy || sessionSnapshot().uncertain) return;
         let timer_counter = 1;
         if (window.sendRequestsStatistic) {
             performance.clearMeasures();
