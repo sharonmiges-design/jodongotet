@@ -5,7 +5,6 @@ import Text from '@/components/shared_ui/text';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
-
 import OnboardTourHandler from '../tutorials/dbot-tours/onboarding-tour';
 import Announcements from './announcements';
 import Cards from './cards';
@@ -24,10 +23,9 @@ const DashboardComponent = observer(
         const { active_tab, active_tour } = dashboard;
 
         const has_dashboard_strategies = !!dashboard_strategies?.length;
-
         const { isDesktop, isTablet } = useDevice();
 
-        // Trading calculator
+        // Trading Calculator
         const [stake, setStake] = React.useState('1');
         const [payout, setPayout] = React.useState('1.95');
 
@@ -35,6 +33,8 @@ const DashboardComponent = observer(
         const payoutAmount = Number(payout);
 
         const isValid =
+            stake.trim() !== '' &&
+            payout.trim() !== '' &&
             Number.isFinite(stakeAmount) &&
             Number.isFinite(payoutAmount) &&
             stakeAmount > 0 &&
@@ -42,8 +42,7 @@ const DashboardComponent = observer(
 
         const potentialProfit = payoutAmount - stakeAmount;
 
-        const formatAmount = (value: number) =>
-            value.toFixed(2);
+        const formatAmount = (value: number) => value.toFixed(2);
 
         return (
             <React.Fragment>
@@ -84,9 +83,7 @@ const DashboardComponent = observer(
                                         lineHeight='xxl'
                                         weight='bold'
                                     >
-                                        {localize(
-                                            'Load or build your bot'
-                                        )}
+                                        {localize('Load or build your bot')}
                                     </Text>
                                 )}
 
@@ -121,7 +118,7 @@ const DashboardComponent = observer(
                             />
                         </div>
 
-                        {/* NEW ANALYSIS TOOLS */}
+                        {/* JODONGO TET ANALYSIS TOOLS */}
 
                         <section
                             style={{
@@ -148,8 +145,8 @@ const DashboardComponent = observer(
                                     marginBottom: '24px',
                                 }}
                             >
-                                Calculate your potential trading
-                                profit and loss before placing a trade.
+                                Calculate your potential trading profit
+                                and loss before placing a trade.
                             </p>
 
                             <div
@@ -198,3 +195,123 @@ const DashboardComponent = observer(
                                         boxSizing: 'border-box',
                                         color: '#111827',
                                         background: '#ffffff',
+                                    }}
+                                />
+
+                                <label
+                                    htmlFor='jodongo-payout'
+                                    style={{
+                                        display: 'block',
+                                        marginBottom: '8px',
+                                    }}
+                                >
+                                    Expected Total Payout
+                                </label>
+
+                                <input
+                                    id='jodongo-payout'
+                                    type='number'
+                                    min='0'
+                                    step='0.01'
+                                    value={payout}
+                                    onChange={event =>
+                                        setPayout(event.target.value)
+                                    }
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #526277',
+                                        marginBottom: '20px',
+                                        boxSizing: 'border-box',
+                                        color: '#111827',
+                                        background: '#ffffff',
+                                    }}
+                                />
+
+                                <div
+                                    aria-live='polite'
+                                    style={{
+                                        background: '#263449',
+                                        padding: '16px',
+                                        borderRadius: '10px',
+                                    }}
+                                >
+                                    {isValid ? (
+                                        <>
+                                            <p>
+                                                Stake:{' '}
+                                                <strong>
+                                                    {formatAmount(stakeAmount)}
+                                                </strong>
+                                            </p>
+
+                                            <p>
+                                                Total Payout:{' '}
+                                                <strong>
+                                                    {formatAmount(payoutAmount)}
+                                                </strong>
+                                            </p>
+
+                                            <p>
+                                                Potential Profit / Loss:{' '}
+                                                <strong
+                                                    style={{
+                                                        color:
+                                                            potentialProfit >= 0
+                                                                ? '#4ade80'
+                                                                : '#f87171',
+                                                    }}
+                                                >
+                                                    {formatAmount(
+                                                        potentialProfit
+                                                    )}
+                                                </strong>
+                                            </p>
+
+                                            <p>
+                                                Maximum Stake Loss:{' '}
+                                                <strong>
+                                                    {formatAmount(stakeAmount)}
+                                                </strong>
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <p>
+                                            Enter a stake greater than zero
+                                            and a valid payout.
+                                        </p>
+                                    )}
+                                </div>
+
+                                <p
+                                    style={{
+                                        fontSize: '12px',
+                                        color: '#aab7ca',
+                                        marginTop: '16px',
+                                    }}
+                                >
+                                    Enter amounts in your account currency.
+                                    This calculator uses your inputs,
+                                    not live market data.
+                                    Results are estimates, not trading
+                                    signals. Trading involves risk.
+                                </p>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <InfoPanel />
+
+                {active_tab === 0 && (
+                    <OnboardTourHandler
+                        is_mobile={!isDesktop}
+                    />
+                )}
+            </React.Fragment>
+        );
+    }
+);
+
+export default DashboardComponent;
