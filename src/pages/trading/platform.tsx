@@ -90,7 +90,7 @@ export function TradingNavigation({ activeTab, onNavigate }: { activeTab: number
                 {PLATFORM_PAGES.map(page => (
                     <Link
                         key={page.hash}
-                        to={`${window.location.search}#${page.hash}`}
+                        to={`/${page.path}${window.location.search}`}
                         aria-current={activeTab === page.tab ? 'page' : undefined}
                         onClick={e => {
                             e.preventDefault();
@@ -880,29 +880,61 @@ export function ExtraPage({ tab }: { tab: number }) {
                 </div>
             </section>
         );
-    const name = PLATFORM_PAGES.find(page => page.tab === tab)?.name || 'Feature';
+    const page = PLATFORM_PAGES.find(page => page.tab === tab);
+    const content = PAGE_CONTENT[tab];
+    if (!page || !content) return null;
     return (
-        <section className='jt-page jt-coming'>
-            <p className='jt-eyebrow'>JODONGO TET · WORKSPACE EXPANSION</p>
-            <div className='jt-coming-symbol' aria-hidden='true'>
-                ＋
-            </div>
-            <h1>{name} – Coming Soon</h1>
-            <p className='jt-lead'>
-                {tab === 5 ? 'A dedicated home for future premium strategies.' : 'This workspace is under development.'}
-            </p>
-            <p>
-                New tools appear here once their integration and trading controls are ready. Explore available
-                strategies and live market data in the meantime.
-            </p>
-            <div className='jt-actions'>
-                <Link to={`${window.location.search}#free_bots`} className='jt-primary'>
-                    Explore Free Bots
-                </Link>
-                <button className='jt-secondary' onClick={openScanner}>
-                    Open Smart Scan
-                </button>
+        <section className='jt-page'>
+            <p className='jt-eyebrow'>{content.eyebrow}</p>
+            <h1>{page.name}</h1>
+            <p className='jt-lead'>{content.description}</p>
+            <div className='jt-empty' role='status'>
+                <div className='jt-empty-symbol' aria-hidden='true'>
+                    {content.symbol}
+                </div>
+                <h2>{content.emptyTitle}</h2>
+                <p>{content.emptyText}</p>
             </div>
         </section>
     );
 }
+const PAGE_CONTENT: Record<
+    number,
+    { eyebrow: string; description: string; symbol: string; emptyTitle: string; emptyText: string }
+> = {
+    5: {
+        eyebrow: 'ADVANCED STRATEGIES',
+        description: 'Premium strategies with extended configuration and risk controls.',
+        symbol: '★',
+        emptyTitle: 'No premium bots available',
+        emptyText: 'Premium bots you have access to will be listed here.',
+    },
+    7: {
+        eyebrow: 'FAST CONTRACT TESTING',
+        description: 'Run and review short-duration contract experiments on a demo account.',
+        symbol: '⚡',
+        emptyTitle: 'No speed tests yet',
+        emptyText: 'Your speed test sessions and their results will appear here.',
+    },
+    8: {
+        eyebrow: 'POSITION HEDGING',
+        description: 'Pair opposing contracts to manage exposure across a trading session.',
+        symbol: '⇅',
+        emptyTitle: 'No hedge positions',
+        emptyText: 'Hedged contract pairs you open will appear here.',
+    },
+    10: {
+        eyebrow: 'DIRECT EXECUTION',
+        description: 'Place individual contracts on your connected Deriv account.',
+        symbol: '↗',
+        emptyTitle: 'No manual trades',
+        emptyText: 'Contracts you place manually will be listed here.',
+    },
+    11: {
+        eyebrow: 'FOLLOW TRADERS',
+        description: 'Follow other traders and mirror their contracts on your account.',
+        symbol: '⧉',
+        emptyTitle: 'Not copying anyone yet',
+        emptyText: 'Traders you follow and copied contracts will appear here.',
+    },
+};
