@@ -346,7 +346,9 @@ const AppWrapper = observer(() => {
     const handleTabChange = React.useCallback(
         (tab_index: number) => {
             setActiveTab(tab_index);
-            navigate(`${location.search}#${hash[tab_index] || hash[0]}`);
+            const page = PLATFORM_PAGES.find(page => page.tab === tab_index) || PLATFORM_PAGES[0];
+            // Each workspace page has its own route; the App Builder preview keeps hash navigation
+            navigate(is_preview_mode ? `${location.search}#${hash[tab_index] || hash[0]}` : `/${page.path}${location.search}`);
             const el_id = TAB_IDS[tab_index];
             if (el_id) {
                 const el_tab = document.getElementById(el_id);

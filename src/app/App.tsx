@@ -1,17 +1,19 @@
 import { lazy, Suspense } from 'react';
 import React from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router';
-import { cleanupUrl, handleOAuthCallback } from '@/external/deriv-core';
 import ChunkLoader from '@/components/loader/chunk-loader';
 import LocalStorageSyncWrapper from '@/components/localStorage-sync-wrapper';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
+import { cleanupUrl, handleOAuthCallback } from '@/external/deriv-core';
 import { useAccountSwitching } from '@/hooks/useAccountSwitching';
 import { useLanguageFromURL } from '@/hooks/useLanguageFromURL';
 import { StoreProvider } from '@/hooks/useStore';
 import { isPreviewMode, PREVIEW_BASE_PATH } from '@/utils/is-preview-mode';
 import { localize, TranslationProvider } from '@deriv-com/translations';
+import { PLATFORM_PAGES } from '../pages/trading/navigation';
 import CoreStoreProvider from './CoreStoreProvider';
 import i18nInstance from './i18n';
+import { AppErrorBoundary, NotFoundPage, RouteErrorPage } from './route-fallbacks';
 import './app-root.scss';
 
 const Layout = lazy(() => import('../components/layout'));
@@ -35,6 +37,7 @@ const router = createBrowserRouter(
     createRoutesFromElements(
         <Route
             path='/'
+            errorElement={<RouteErrorPage />}
             element={
                 <Suspense
                     fallback={<ChunkLoader message={localize('Please wait while we connect to the server...')} />}
@@ -58,7 +61,11 @@ const router = createBrowserRouter(
             <Route index element={<AppRoot />} />
             {/* App Builder embeds the template at /preview — render the same app shell */}
             <Route path='preview' element={<AppRoot />} />
-            <Route path=':section' element={<AppRoot />} />
+            {/* Every workspace page gets its own route; they share one app shell so state survives navigation */}
+            {PLATFORM_PAGES.map(page => (
+                <Route key={page.path} path={page.path} element={<AppRoot />} />
+            ))}
+            <Route path='*' element={<NotFoundPage />} />
         </Route>
     ),
     { basename: routerBasename }
@@ -114,7 +121,11 @@ function App() {
         handleCallback();
     }, []);
 
-    return <RouterProvider router={router} />;
+    return (
+        <AppErrorBoundary>
+            <RouterProvider router={router} />
+        </AppErrorBoundary>
+    );
 }
 
 export default App;

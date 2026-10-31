@@ -379,26 +379,35 @@
         margin: 7px 0 0;
     }
 }
-.jt-coming {
-    max-width: 850px;
-    min-height: 430px;
-    padding-top: 50px;
-    p:not(.jt-eyebrow) {
-        max-width: 570px;
+.jt-empty {
+    max-width: 640px;
+    margin-top: 28px;
+    padding: 40px 28px;
+    border: 1px dashed #33546e;
+    border-radius: 14px;
+    background: #0f2033;
+    text-align: center;
+    h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        color: #e6f1fb;
+    }
+    p {
+        margin: 0;
         color: #a8bfd6;
     }
 }
-.jt-coming-symbol {
-    height: 70px;
-    width: 70px;
+.jt-empty-symbol {
+    height: 56px;
+    width: 56px;
     display: grid;
     place-items: center;
-    border-radius: 18px;
+    margin: 0 auto 16px;
+    border-radius: 16px;
     border: 1px solid #33546e;
     color: #8de4f4;
     background: #132a40;
-    font-size: 38px;
-    margin: 22px 0;
+    font-size: 26px;
 }
 .jt-session-bar {
     display: flex;
